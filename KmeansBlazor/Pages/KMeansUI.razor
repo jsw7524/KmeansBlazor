@@ -1,0 +1,51 @@
+﻿@page "/KMeansUI"
+<h3>KMeans</h3>
+<div>
+    <input type="number" @bind="@cluster"  />
+    <button @onclick="Clustering">Run</button>
+</div>
+
+<svg height="2024px" width="2024px" @onclick="HandleClick">
+
+    @foreach (var p in points)
+    {
+        <circle cx="@p.X" cy="@p.Y" r=10 stroke="black" fill="rgb(@((6846*p.Cluster)%256), @((8489*p.Cluster)%256), @((3458*p.Cluster)%256))" />
+
+    }
+</svg>
+
+
+
+
+@code {
+    int cluster { get; set; } = 3;
+    string color { get; set; } = "gray";
+
+    int GetRand(int n)
+    {
+        return (75243 * n) % 256;
+    }
+
+    void Clustering()
+    {
+        if (cluster > counter)
+        {
+            return;
+        }
+
+        Kmeans.KMeans kMeans = new Kmeans.KMeans(points.ToArray(), counter, cluster);
+        kMeans.KMeans_Inital_Forgy();
+        points = (kMeans.KMeans_Algorithm()).ToList();
+        StateHasChanged();
+
+    }
+
+    List<Kmeans.Point> points = new List<Kmeans.Point>();
+    int counter = 0;
+    void HandleClick(MouseEventArgs args)
+    {
+        counter += 1;
+        points.Add(new Kmeans.Point() { X = (int)args.OffsetX, Y = (int)args.OffsetY, Cluster = int.MaxValue });
+        //Console.WriteLine("This is a left click");
+    }
+}
